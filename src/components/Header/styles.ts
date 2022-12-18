@@ -20,6 +20,18 @@ export const Logo = styled(HeaderBase)`
   svg {
     color: ${(props) => props.theme['green-500']};
   }
+
+  h1 {
+    color: ${(props) => props.theme['gray-100']};
+  }
+
+  a {
+    text-decoration: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
 `
 
 export const Tabs = styled(HeaderBase)`

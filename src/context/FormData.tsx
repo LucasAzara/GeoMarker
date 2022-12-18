@@ -2,8 +2,16 @@ import { createContext, ReactNode, useEffect, useState } from 'react'
 // Id generator
 import { v4 as uuidv4 } from 'uuid'
 // Firebase (DB)
-import { setDoc, getDoc } from 'firebase/firestore'
-import { db, docRef } from '../firebase'
+import {
+  setDoc,
+  getDoc,
+  doc,
+  increment,
+  collection,
+  getDocs,
+  updateDoc,
+} from 'firebase/firestore'
+import { db, table } from '../firebase'
 
 interface IFormData {
   children: ReactNode
@@ -34,8 +42,22 @@ export function FormData({ children }: IFormData) {
   const [loadState, setLoadState] = useState<boolean | undefined>(undefined)
 
   // Update Database
-  const updateFirebase = async (newMapData: IMapData[]) => {
-    await setDoc(docRef, { votes: newMapData })
+  const updateFirebase = async (data: IMapData) => {
+    // Increment by 1 point
+    await updateDoc(doc(db, table, data.companyName), {
+      vote: increment(1),
+    })
+  }
+
+  const addFireBase = async (data: IMapData) => {
+    // Add to Votes
+    await setDoc(doc(db, table, data.companyName), {
+      companyLat: data.companyLat,
+      companyLong: data.companyLong,
+      companyName: data.companyName,
+      id: data.id,
+      vote: data.vote,
+    })
   }
 
   // Update State
@@ -47,30 +69,28 @@ export function FormData({ children }: IFormData) {
 
     // If it does, add to the vote
     if (findVote) {
-      const newMapData = mapData.map((data) => {
-        if (data.companyName === vote.companyName.toUpperCase())
-          return { ...data, vote: data.vote + 1 }
-        return data
-      })
-
-      await updateFirebase(newMapData)
-      setMapData(newMapData)
+      console.log(findVote)
+      await updateFirebase(findVote)
+      setMapData((mapData) =>
+        mapData.map((data) => {
+          if (data.companyName === vote.companyName.toUpperCase())
+            return { ...data, vote: data.vote + 1 }
+          return data
+        }),
+      )
     } else {
       // Else, put new vote into array
 
-      const newMapData = [
-        ...mapData,
-        {
-          companyName: vote.companyName.toUpperCase(),
-          companyLat: vote.companyLat,
-          companyLong: vote.companyLong,
-          id: uuidv4(),
-          vote: 1,
-        },
-      ]
+      const newData = {
+        companyName: vote.companyName.toUpperCase(),
+        companyLat: vote.companyLat,
+        companyLong: vote.companyLong,
+        id: uuidv4(),
+        vote: 1,
+      }
 
-      await updateFirebase(newMapData)
-      setMapData(newMapData)
+      await addFireBase(newData)
+      setMapData((mapData) => [...mapData, newData])
     }
   }
 
@@ -80,26 +100,21 @@ export function FormData({ children }: IFormData) {
 
   // Fetch Database
   const fetchPost = async () => {
-    await getDoc(docRef)
-      .then((docRef) => {
-        const newData = docRef.data()
-
-        const newMapData: IMapData[] = newData!.votes.map((votes: IMapData) => {
-          return {
-            id: votes.id,
-            companyName: votes.companyName,
-            companyLat: votes.companyLat,
-            companyLong: votes.companyLong,
-            vote: votes.vote,
-          }
-        })
-
-        setMapData(newMapData)
-        setLoadState(true)
+    try {
+      const querySnapshot = await getDocs(collection(db, table))
+      const newMapData = querySnapshot.docs.map((query) => {
+        return {
+          companyLat: query.data().companyLat,
+          companyLong: query.data().companyLong,
+          companyName: query.data().companyName,
+          id: query.data().id,
+          vote: query.data().vote,
+        }
       })
-      .catch((error) => {
-        console.error(error)
-      })
+      setMapData(newMapData)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   // Load on start

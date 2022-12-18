@@ -9,8 +9,10 @@ export function Header() {
   return (
     <HeaderContainer>
       <Logo>
-        <GlobeHemisphereWest size={64} />
-        <h1>GeoMarker</h1>
+        <NavLink to="/">
+          <GlobeHemisphereWest size={64} />
+          <h1>GeoMarker</h1>
+        </NavLink>
       </Logo>
       <Tabs>
         <NavLink to="/">
