@@ -11,7 +11,7 @@ import {
 // Icons
 import { ArrowCircleRight } from 'phosphor-react'
 // Popup
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2/dist/sweetalert2.js'
 // Context
 import { FormContext, IMap } from '../../context/FormData'
 // Form Functions
@@ -19,6 +19,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod'
 import { useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const newCompanyValidationSchema = zod.object({
   companyName: zod.string().min(1, { message: 'Fill out company name' }),
@@ -38,6 +39,9 @@ export function Home() {
   // Context
   const { handleAddMapData } = useContext(FormContext)
 
+  // Router
+  const navigate = useNavigate()
+
   // Form Validation
   const newCompanyForm = useForm<newCompanyFormData>({
     resolver: zodResolver(newCompanyValidationSchema),
@@ -54,8 +58,25 @@ export function Home() {
     formState: { errors },
   } = newCompanyForm
 
-  const formData = (data: newCompanyFormData) => {
+  const formData = async (data: newCompanyFormData) => {
     handleAddMapData(data)
+      .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Thank you for voting!',
+        })
+      })
+      .then(() => {
+        navigate('/map')
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `Couldn't register you're vote, try again later!`,
+        })
+        console.error(error)
+      })
   }
 
   return (

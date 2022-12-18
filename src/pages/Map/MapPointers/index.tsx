@@ -25,7 +25,11 @@ export function MapPointer() {
   })
 
   return (
-    <ComposableMap>
+    <ComposableMap
+      projectionConfig={{
+        center: [20, 0],
+      }}
+    >
       <Geographies geography={geoUrl}>
         {({ geographies }) =>
           geographies.map((geo) => (
@@ -33,7 +37,7 @@ export function MapPointer() {
           ))
         }
       </Geographies>
-      {markers.map(({ name, coordinates }) => (
+      {markers.map(({ name, coordinates, points }) => (
         <Marker key={name} coordinates={coordinates}>
           <g
             fill="none"
@@ -46,6 +50,18 @@ export function MapPointer() {
             <circle cx="12" cy="10" r="3" />
             <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 6.9 8 11.7z" />
           </g>
+          <text
+            textAnchor="middle"
+            y={-25}
+            x={0}
+            style={{
+              fontFamily: 'Roboto',
+              fill: '#00B37E',
+              fontSize: '8px',
+            }}
+          >
+            {name}, {points}
+          </text>
         </Marker>
       ))}
     </ComposableMap>

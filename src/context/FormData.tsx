@@ -2,8 +2,8 @@ import { createContext, ReactNode, useEffect, useState } from 'react'
 // Id generator
 import { v4 as uuidv4 } from 'uuid'
 // Firebase (DB)
-import { collection, addDoc, getDocs } from 'firebase/firestore'
-import { db } from '../firebase'
+import { setDoc, getDoc } from 'firebase/firestore'
+import { db, docRef } from '../firebase'
 
 interface IFormData {
   children: ReactNode
@@ -22,16 +22,24 @@ export interface IMapData extends IMap {
 
 export interface IMapContext {
   mapData: IMapData[]
-  handleAddMapData: (vote: IMap) => void
+  loadState: boolean | undefined
+  handleAddMapData: (vote: IMap) => Promise<void>
+  handleSetLoadState: () => void
 }
 
 export const FormContext = createContext({} as IMapContext)
 
 export function FormData({ children }: IFormData) {
   const [mapData, setMapData] = useState<IMapData[]>([])
+  const [loadState, setLoadState] = useState<boolean | undefined>(undefined)
+
+  // Update Database
+  const updateFirebase = async (newMapData: IMapData[]) => {
+    await setDoc(docRef, { votes: newMapData })
+  }
 
   // Update State
-  const handleAddMapData = (vote: IMap) => {
+  const handleAddMapData = async (vote: IMap) => {
     // Does it already exist?
     const findVote = mapData.find(
       (map) => map.companyName === vote.companyName.toUpperCase(),
@@ -39,56 +47,59 @@ export function FormData({ children }: IFormData) {
 
     // If it does, add to the vote
     if (findVote) {
-      setMapData((mapData) =>
-        mapData.map((data) => {
-          if (data.companyName === vote.companyName.toUpperCase())
-            return { ...data, vote: data.vote + 1 }
-          return data
-        }),
-      )
+      const newMapData = mapData.map((data) => {
+        if (data.companyName === vote.companyName.toUpperCase())
+          return { ...data, vote: data.vote + 1 }
+        return data
+      })
+
+      await updateFirebase(newMapData)
+      setMapData(newMapData)
     } else {
       // Else, put new vote into array
 
-      setMapData((mapData) => {
-        return [
-          ...mapData,
-          {
-            companyName: vote.companyName.toUpperCase(),
-            companyLat: vote.companyLat,
-            companyLong: vote.companyLong,
-            id: uuidv4(),
-            vote: 1,
-          },
-        ]
-      })
+      const newMapData = [
+        ...mapData,
+        {
+          companyName: vote.companyName.toUpperCase(),
+          companyLat: vote.companyLat,
+          companyLong: vote.companyLong,
+          id: uuidv4(),
+          vote: 1,
+        },
+      ]
+
+      await updateFirebase(newMapData)
+      setMapData(newMapData)
     }
+  }
+
+  const handleSetLoadState = () => {
+    setLoadState(undefined)
   }
 
   // Fetch Database
   const fetchPost = async () => {
-    try {
-      await getDocs(collection(db, 'votes')).then((querySnapshot) => {
-        const newData = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-        }))
+    await getDoc(docRef)
+      .then((docRef) => {
+        const newData = docRef.data()
 
-        const newMapData: IMapData[] = newData[0].votes.map(
-          (votes: IMapData) => {
-            return {
-              id: votes.id,
-              companyName: votes.companyName,
-              companyLat: votes.companyLat,
-              companyLong: votes.companyLong,
-              vote: votes.vote,
-            }
-          },
-        )
+        const newMapData: IMapData[] = newData!.votes.map((votes: IMapData) => {
+          return {
+            id: votes.id,
+            companyName: votes.companyName,
+            companyLat: votes.companyLat,
+            companyLong: votes.companyLong,
+            vote: votes.vote,
+          }
+        })
 
         setMapData(newMapData)
+        setLoadState(true)
       })
-    } catch (error) {
-      console.log('Error getting firebase data:', error)
-    }
+      .catch((error) => {
+        console.error(error)
+      })
   }
 
   // Load on start
@@ -96,24 +107,10 @@ export function FormData({ children }: IFormData) {
     fetchPost()
   }, [])
 
-  useEffect(() => {
-    if (mapData.length !== 0) {
-      // Update Database
-      const updateFirebase = async () => {
-        try {
-          const docRef = await addDoc(collection(db, 'votes'), {
-            votes: mapData,
-          })
-          console.log('Document written with ID: ', docRef.id)
-        } catch (e) {
-          console.error('Error adding document: ', e)
-        }
-      }
-    }
-  }, [mapData])
-
   return (
-    <FormContext.Provider value={{ mapData, handleAddMapData }}>
+    <FormContext.Provider
+      value={{ mapData, loadState, handleAddMapData, handleSetLoadState }}
+    >
       {children}
     </FormContext.Provider>
   )

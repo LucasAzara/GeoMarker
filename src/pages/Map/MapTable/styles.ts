@@ -23,7 +23,7 @@ export const TableContainer = styled.div`
   ul {
     display: flex;
     flex-direction: column;
-    max-height: 50vh;
+    max-height: 35vh;
     overflow: auto;
 
     li:nth-child(even) {
