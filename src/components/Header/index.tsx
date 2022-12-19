@@ -8,12 +8,14 @@ import { NavLink } from 'react-router-dom'
 export function Header() {
   return (
     <HeaderContainer>
+      {/* Logo */}
       <Logo>
         <NavLink to="/">
           <GlobeHemisphereWest size={64} />
           <h1>GeoMarker</h1>
         </NavLink>
       </Logo>
+      {/* Menu */}
       <Tabs>
         <NavLink to="/">
           <Table size={46} />

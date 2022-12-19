@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid'
 // Firebase (DB)
 import {
   setDoc,
-  getDoc,
   doc,
   increment,
   collection,
@@ -12,55 +11,35 @@ import {
   updateDoc,
 } from 'firebase/firestore'
 import { db, table } from '../firebase'
+// Interfaces
+import {
+  IMapData,
+  IMap,
+  IMapContext,
+  updateFirebase,
+  addFireBase,
+} from './Actions/Actions'
 
 interface IFormData {
   children: ReactNode
 }
 
-export interface IMap {
-  companyName: string
-  companyLat: number | undefined
-  companyLong: number | undefined
-}
-
-export interface IMapData extends IMap {
-  id: string
-  vote: number
-}
-
-export interface IMapContext {
-  mapData: IMapData[]
-  loadState: boolean | undefined
-  handleAddMapData: (vote: IMap) => Promise<void>
-  handleSetLoadState: () => void
-}
-
+// Context
 export const FormContext = createContext({} as IMapContext)
 
+// -------------------------------------------------------------------------------
+
 export function FormData({ children }: IFormData) {
+  // States
+
+  // Map
   const [mapData, setMapData] = useState<IMapData[]>([])
+  // Loaded data from DB
   const [loadState, setLoadState] = useState<boolean | undefined>(undefined)
 
-  // Update Database
-  const updateFirebase = async (data: IMapData) => {
-    // Increment by 1 point
-    await updateDoc(doc(db, table, data.companyName), {
-      vote: increment(1),
-    })
-  }
+  // Functions
 
-  const addFireBase = async (data: IMapData) => {
-    // Add to Votes
-    await setDoc(doc(db, table, data.companyName), {
-      companyLat: data.companyLat,
-      companyLong: data.companyLong,
-      companyName: data.companyName,
-      id: data.id,
-      vote: data.vote,
-    })
-  }
-
-  // Update State
+  // Update State & DB
   const handleAddMapData = async (vote: IMap) => {
     // Does it already exist?
     const findVote = mapData.find(
@@ -69,7 +48,6 @@ export function FormData({ children }: IFormData) {
 
     // If it does, add to the vote
     if (findVote) {
-      console.log(findVote)
       await updateFirebase(findVote)
       setMapData((mapData) =>
         mapData.map((data) => {
@@ -94,11 +72,12 @@ export function FormData({ children }: IFormData) {
     }
   }
 
+  // loadState Reset
   const handleSetLoadState = () => {
     setLoadState(undefined)
   }
 
-  // Fetch Database
+  // Fetch DB
   const fetchPost = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, table))
@@ -113,6 +92,7 @@ export function FormData({ children }: IFormData) {
       })
       setMapData(newMapData)
     } catch (error) {
+      setLoadState(false)
       console.error(error)
     }
   }

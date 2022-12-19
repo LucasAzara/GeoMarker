@@ -1,21 +1,14 @@
-// CSS
+// Context
 import { useContext } from 'react'
 import { FormContext, IMapData } from '../../../context/FormData'
+// CSS
 import { TableContainer } from './styles'
 
 export function MapTable() {
+  // Context
   const { mapData } = useContext(FormContext)
 
-  function compare(a: IMapData, b: IMapData) {
-    if (a.vote > b.vote) {
-      return -1
-    }
-    if (a.vote < b.vote) {
-      return 1
-    }
-    return 0
-  }
-
+  // Order from Greatest to least number of votes
   const orderedVotes = mapData.sort(compare)
 
   return (
@@ -24,6 +17,7 @@ export function MapTable() {
         <h1>Company</h1>
         <h1>Score</h1>
       </div>
+      {/* List of all companies that were voted for */}
       <ul>
         {orderedVotes.map((votes) => {
           return (
@@ -36,4 +30,15 @@ export function MapTable() {
       </ul>
     </TableContainer>
   )
+}
+
+// Compare Function
+function compare(a: IMapData, b: IMapData) {
+  if (a.vote > b.vote) {
+    return -1
+  }
+  if (a.vote < b.vote) {
+    return 1
+  }
+  return 0
 }
