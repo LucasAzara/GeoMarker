@@ -31,4 +31,14 @@ export const TableContainer = styled.div`
       color: ${(props) => props.theme['gray-500']};
     }
   }
+
+  @media (max-width: 768px) {
+    div {
+      padding: 0.5rem 0rem;
+    }
+
+    li {
+      padding: 0.5rem;
+    }
+  }
 `

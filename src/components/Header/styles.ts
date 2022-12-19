@@ -19,6 +19,8 @@ export const Logo = styled(HeaderBase)`
 
   svg {
     color: ${(props) => props.theme['green-500']};
+    height: 4rem;
+    width: 4rem;
   }
 
   h1 {
@@ -32,6 +34,12 @@ export const Logo = styled(HeaderBase)`
     align-items: center;
     gap: 8px;
   }
+
+  @media (max-width: 425px) {
+    h1 {
+      display: none;
+    }
+  }
 `
 
 export const Tabs = styled(HeaderBase)`
@@ -39,6 +47,8 @@ export const Tabs = styled(HeaderBase)`
 
   svg {
     color: ${(props) => props.theme['gray-100']};
+    height: 2.875rem;
+    width: 2.875rem;
   }
 
   a {
@@ -54,5 +64,16 @@ export const Tabs = styled(HeaderBase)`
 
   a:hover {
     border-bottom: 5px solid ${(props) => props.theme['green-500']};
+  }
+
+  @media (max-width: 425px) {
+    a {
+      border-top: 2.5px solid transparent;
+      border-bottom: 2.5px solid transparent;
+    }
+
+    a:hover {
+      border-bottom: 2.5px solid ${(props) => props.theme['green-500']};
+    }
   }
 `

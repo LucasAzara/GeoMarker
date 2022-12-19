@@ -4,7 +4,12 @@ export const Form = styled.form`
   display: grid;
   grid-template-columns: repeat(2, 50%);
   gap: 16px;
-  width: 50%;
+  width: calc(50% - 16px);
+
+  @media (max-width: 768px) {
+    width: calc(100% - 8px);
+    gap: 8px;
+  }
 `
 
 export const FormInput = styled.input`
@@ -36,6 +41,11 @@ export const FormInput = styled.input`
   /* Firefox */
   input[type='number'] {
     -moz-appearance: textfield;
+  }
+
+  @media (max-width: 768px) {
+    grid-column-start: 1;
+    grid-column-end: 3;
   }
 `
 export const FormSubmit = styled.button`

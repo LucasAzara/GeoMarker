@@ -38,7 +38,7 @@ const Description = () => {
         </p>
         <p>Go on give it a try!</p>
         <IntroButton onClick={FormFocus}>
-          <ArrowCircleRight size={46} />
+          <ArrowCircleRight />
         </IntroButton>
       </div>
     </FormIntro>

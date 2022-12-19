@@ -11,6 +11,10 @@ export const HomeContainer = styled.div`
   padding: 2rem;
 
   min-height: 65vh;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `
 
 export const FormIntro = styled.div`
@@ -24,6 +28,14 @@ export const FormIntro = styled.div`
     gap: 16px;
 
     width: 80%;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+
+  svg {
+    font-size: 2.875rem;
   }
 `
 

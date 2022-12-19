@@ -11,17 +11,17 @@ export function Header() {
       {/* Logo */}
       <Logo>
         <NavLink to="/">
-          <GlobeHemisphereWest size={64} />
+          <GlobeHemisphereWest />
           <h1>GeoMarker</h1>
         </NavLink>
       </Logo>
       {/* Menu */}
       <Tabs>
         <NavLink to="/">
-          <Table size={46} />
+          <Table />
         </NavLink>
         <NavLink to="/map">
-          <MapPinLine size={46} />
+          <MapPinLine />
         </NavLink>
       </Tabs>
     </HeaderContainer>
