@@ -27,8 +27,11 @@ export const TableContainer = styled.div`
     overflow: auto;
 
     li:nth-child(even) {
-      background-color: ${(props) => props.theme['gray-200']};
-      color: ${(props) => props.theme['gray-500']};
+      background-color: ${(props) => props.theme['gray-700']};
+      p{
+        color: ${(props) => props.theme['green-300']};
+        font-weight: 700;
+      }
     }
   }
 

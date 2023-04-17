@@ -1,6 +1,7 @@
 // Context
 import { useContext } from 'react'
-import { FormContext, IMapData } from '../../../context/FormData'
+import { FormContext} from '../../../context/FormData'
+import { IMapData } from '../../../context/Actions/Actions'
 // CSS
 import { TableContainer } from './styles'
 

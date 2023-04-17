@@ -3,12 +3,8 @@ import { createContext, ReactNode, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 // Firebase (DB)
 import {
-  setDoc,
-  doc,
-  increment,
   collection,
   getDocs,
-  updateDoc,
 } from 'firebase/firestore'
 import { db, table } from '../firebase'
 // Interfaces
